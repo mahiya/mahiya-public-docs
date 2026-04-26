@@ -7,12 +7,301 @@
   <meta name="description" content="Mahiya Public Documentation">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css">
+  <style>
+    /* ==== Dark Mode (GitHub Dark 風) ==== */
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --bg-code: #161b22;
+      --bg-quote: #161b22;
+      --text-primary: #c9d1d9;
+      --text-secondary: #8b949e;
+      --text-heading: #f0f6fc;
+      --border-color: #30363d;
+      --accent: #42b983;
+      --accent-hover: #5ccfa0;
+      --link: #58a6ff;
+      --link-hover: #79b8ff;
+    }
+
+    html, body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    /* 本文 */
+    body, .markdown-section {
+      color: var(--text-primary);
+    }
+    .markdown-section {
+      max-width: 900px;
+    }
+
+    /* 見出し */
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      color: var(--text-heading);
+      border-bottom-color: var(--border-color);
+    }
+    .markdown-section h2 {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.3em;
+    }
+
+    /* 段落 / リスト */
+    .markdown-section p,
+    .markdown-section li,
+    .markdown-section td,
+    .markdown-section th {
+      color: var(--text-primary);
+    }
+
+    /* リンク */
+    .markdown-section a,
+    .markdown-section a code {
+      color: var(--link);
+      font-weight: normal;
+    }
+    .markdown-section a:hover {
+      color: var(--link-hover);
+    }
+
+    /* インラインコード */
+    .markdown-section code {
+      background-color: rgba(110, 118, 129, 0.4);
+      color: #e6edf3;
+      border-radius: 6px;
+      padding: 0.2em 0.4em;
+    }
+
+    /* コードブロック */
+    .markdown-section pre {
+      background-color: var(--bg-code);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+    .markdown-section pre > code {
+      background: transparent;
+      color: #e6edf3;
+      padding: 0;
+    }
+
+    /* 引用 */
+    .markdown-section blockquote {
+      background-color: var(--bg-quote);
+      border-left: 4px solid var(--accent);
+      color: var(--text-secondary);
+    }
+    .markdown-section blockquote p {
+      color: var(--text-secondary);
+    }
+
+    /* テーブル */
+    .markdown-section table {
+      border-collapse: collapse;
+      display: block;
+      overflow-x: auto;
+    }
+    .markdown-section tr {
+      background-color: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+    }
+    .markdown-section tr:nth-child(2n) {
+      background-color: var(--bg-secondary);
+    }
+    .markdown-section th,
+    .markdown-section td {
+      border: 1px solid var(--border-color);
+      padding: 6px 13px;
+    }
+    .markdown-section th {
+      background-color: var(--bg-tertiary);
+      color: var(--text-heading);
+    }
+
+    /* 区切り線 */
+    .markdown-section hr {
+      border-color: var(--border-color);
+    }
+
+    /* 強調 */
+    .markdown-section strong {
+      color: var(--text-heading);
+    }
+
+    /* ==== サイドバー ==== */
+    .sidebar {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+    }
+    .sidebar-nav,
+    .sidebar-nav ul,
+    .sidebar-nav ul li {
+      color: var(--text-primary);
+    }
+    .sidebar-nav a {
+      color: var(--text-primary) !important;
+    }
+    .sidebar-nav a:hover {
+      color: var(--accent) !important;
+      text-decoration: none;
+    }
+    .sidebar-nav li.active > a {
+      color: var(--accent) !important;
+      border-right-color: var(--accent);
+    }
+    .sidebar-nav li > p {
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+    .sidebar h1 {
+      color: var(--text-heading);
+    }
+    .sidebar h1 a {
+      color: var(--text-heading) !important;
+    }
+    /* サイト名 (name 設定) を非表示 */
+    .sidebar > h1.app-name,
+    .sidebar > h1:first-child:empty,
+    .app-name-link:empty {
+      display: none;
+    }
+
+    /* スクロールバー */
+    .sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: #484f58;
+    }
+
+    /* サイドバートグルボタン */
+    .sidebar-toggle {
+      background-color: transparent;
+    }
+    .sidebar-toggle span {
+      background-color: var(--text-secondary);
+    }
+
+    /* ==== 検索ボックス ==== */
+    .search {
+      border-bottom: 1px solid var(--border-color) !important;
+      margin-bottom: 0 !important;
+    }
+    .search input[type="search"] {
+      background: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 6px;
+    }
+    .search input[type="search"]::placeholder {
+      color: var(--text-secondary) !important;
+    }
+    .search .results-panel {
+      color: var(--text-primary);
+    }
+    .search .matching-post {
+      border-bottom-color: var(--border-color) !important;
+    }
+    .search .matching-post h2,
+    .search .matching-post a {
+      color: var(--link) !important;
+    }
+    .search .matching-post p {
+      color: var(--text-secondary);
+    }
+    .search p.empty {
+      color: var(--text-secondary);
+    }
+    .search .search-keyword {
+      color: var(--accent) !important;
+      background: rgba(66, 185, 131, 0.15);
+      font-style: normal;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* ==== ページネーション ==== */
+    .pagination-item-title {
+      color: var(--text-secondary);
+    }
+    .pagination-item-label {
+      color: var(--link);
+    }
+    .docsify-pagination-container {
+      border-top-color: var(--border-color);
+    }
+
+    /* ==== コピーコードボタン ==== */
+    .docsify-copy-code-button {
+      background: var(--bg-tertiary) !important;
+      color: var(--text-primary) !important;
+      border: 1px solid var(--border-color) !important;
+    }
+    .docsify-copy-code-button:hover {
+      background: #30363d !important;
+    }
+
+    /* ==== カバーページ ==== */
+    section.cover {
+      background: linear-gradient(to left bottom, #0d1117 0%, #161b22 100%) !important;
+    }
+    section.cover .cover-main > p:last-child a {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: #0d1117;
+    }
+    section.cover .cover-main > p:last-child a:hover {
+      background-color: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+    section.cover blockquote > p {
+      color: var(--text-primary);
+    }
+    section.cover h1,
+    section.cover h1 a {
+      color: var(--text-heading) !important;
+    }
+
+    /* ==== アンカー ==== */
+    .anchor span {
+      color: var(--text-heading);
+    }
+
+    /* スクロールバー (本文側) */
+    body::-webkit-scrollbar {
+      width: 10px;
+    }
+    body::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    body::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 5px;
+    }
+    body::-webkit-scrollbar-thumb:hover {
+      background: #484f58;
+    }
+  </style>
 </head>
 <body>
-  <div id="app">読み込み中...</div>
+  <div id="app" style="background:#0d1117;color:#c9d1d9;">読み込み中...</div>
   <script>
     window.$docsify = {
-      name: 'Mahiya Public Docs',
+      name: '',
       repo: '',
       loadSidebar: true,
       subMaxLevel: 3,
