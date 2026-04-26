@@ -1,3 +1,5 @@
+- [ホーム](/)
+
 - Reranker
   - [リランキングモデル（Cross-Encoder）市場比較レポート](docs/reranker/README.md)
   - [BAAI BGE Reranker 市場調査レポート](docs/reranker/baai_bge_reranker.md)
@@ -12,7 +14,7 @@
   - [Voyage AI Rerank 市場調査レポート](docs/reranker/voyage_ai_rerank.md)
   - [ZeroEntropy Zerank 市場調査レポート](docs/reranker/zerank.md)
 
-- Vectordb
+- Vector DB
   - [ベクトルデータベース 市場トップ5 比較分析レポート](docs/vectordb/README.md)
   - [Chroma 市場調査レポート](docs/vectordb/chroma.md)
   - [Deep Lake 市場調査レポート](docs/vectordb/deep_lake.md)
