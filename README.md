@@ -22,6 +22,7 @@
 - [Elastic Inference Service](docs/others/elastic-inference-service.md)
 - [Elastic Cloud 権限管理ベストプラクティス 参考ドキュメント集](docs/others/elastic-role-best-practice.md)
 - [ELSER](docs/others/elser.md)
+- [gpu_specs](docs/others/gpu_specs.md)
 - [Hard Negative Mining 手法 — 全モデル横断サマリ](docs/others/hard-negative-mining.md)
 - [harrier-oss-v1-270m アーキテクチャ解析レポート](docs/others/harrier-oss-v1-270m.md)
 - [HNSW (Hierarchical Navigable Small World)](docs/others/hnsw.md)
