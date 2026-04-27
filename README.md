@@ -67,4 +67,9 @@
 - [Vespa ベクトルデータベース調査レポート](docs/vectordb/vespa.md)
 - [Weaviate 市場調査レポート](docs/vectordb/weaviate.md)
 
+### HTML ページ
+
+- [Elastic Cloud vs Azure AI Search / AWS OpenSearch / Google Vertex AI Search — 比較項目定義](htmls/elastic_vs.html ':ignore :target=_blank')
+- [GPU / AI Accelerator Specs](htmls/gpu_specs.html ':ignore :target=_blank')
+
 <!-- DOCS_LIST:END -->

@@ -15,10 +15,13 @@ from __future__ import annotations
 import re
 
 from _common import (
+    HTML_LINK_OPTS,
     ROOT,
     category_label,
+    extract_html_title,
     extract_title,
     iter_categories,
+    iter_htmls,
     iter_top_level_md,
     relative_link,
 )
@@ -47,6 +50,16 @@ def build_index_body() -> str:
         for md in md_files:
             title = extract_title(md)
             lines.append(f"- [{title}]({relative_link(md)})")
+        lines.append("")
+
+    # HTML ページ (htmls/ 配下)
+    htmls = list(iter_htmls())
+    if htmls:
+        lines.append("### HTML ページ")
+        lines.append("")
+        for html in htmls:
+            title = extract_html_title(html)
+            lines.append(f"- [{title}]({relative_link(html)}{HTML_LINK_OPTS})")
         lines.append("")
 
     # 末尾の空行を整理

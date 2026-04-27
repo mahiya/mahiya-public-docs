@@ -13,6 +13,7 @@ from typing import Iterator
 # プロジェクトルート (このファイルの 1 つ上)
 ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT / "docs"
+HTMLS_DIR = ROOT / "htmls"
 
 # カテゴリ名の表示変換 (ディレクトリ名 → サイドバー / 索引上のラベル)
 CATEGORY_LABELS: dict[str, str] = {
@@ -21,6 +22,10 @@ CATEGORY_LABELS: dict[str, str] = {
     "vectordb": "Vector DB",
     "reranker": "Reranker",
 }
+
+# Docsify のルーターに HTML パスを解釈させないためのリンクオプション。
+# 別タブで開き、SPA の history を汚さない。
+HTML_LINK_OPTS = " ':ignore :target=_blank'"
 
 
 def extract_title(md_path: Path) -> str:
@@ -34,6 +39,22 @@ def extract_title(md_path: Path) -> str:
     except OSError:
         pass
     return md_path.stem
+
+
+def extract_html_title(html_path: Path) -> str:
+    """HTML ファイルから <title> を抽出する。無ければ最初の <h1>、それも無ければファイル名。"""
+    try:
+        text = html_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return html_path.stem
+    m = re.search(r"<title>\s*(.*?)\s*</title>", text, flags=re.IGNORECASE | re.DOTALL)
+    if m:
+        return re.sub(r"\s+", " ", m.group(1)).strip()
+    m = re.search(r"<h1[^>]*>\s*(.*?)\s*</h1>", text, flags=re.IGNORECASE | re.DOTALL)
+    if m:
+        # タグを雑に剥がす
+        return re.sub(r"<[^>]+>", "", m.group(1)).strip()
+    return html_path.stem
 
 
 def category_label(dirname: str) -> str:
@@ -85,3 +106,14 @@ def iter_categories() -> Iterator[tuple[Path, list[Path]]]:
         )
         if md_files:
             yield cat, md_files
+
+
+def iter_htmls() -> Iterator[Path]:
+    """htmls/ 配下の .html ファイルを順番にイテレート。"""
+    if not HTMLS_DIR.is_dir():
+        return
+    files = sorted(
+        [p for p in HTMLS_DIR.rglob("*.html") if is_visible(p)],
+        key=lambda p: p.name.lower(),
+    )
+    yield from files
