@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GPU / AI Accelerator Specs</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --border: #d0d7de;
+    --border-strong: #57606a;
+    --bg-header: #f6f8fa;
+    --bg-row-alt: #fafbfc;
+    --bg-hover: #eef3f8;
+    --text: #1f2328;
+    --text-muted: #57606a;
+    --link: #0969da;
+    --accent: #0969da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --border: #30363d;
+      --border-strong: #8b949e;
+      --bg-header: #161b22;
+      --bg-row-alt: #0d1117;
+      --bg-hover: #1f242c;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --link: #2f81f7;
+      --accent: #2f81f7;
+    }
+    body { background: #0d1117; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--text);
+    margin: 0;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 4px 0;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-header);
+  }
+  .controls label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+  .controls input[type="text"],
+  .controls input[type="number"] {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .controls input[type="number"] { width: 80px; }
+  .controls input[type="text"] { width: 180px; }
+  .maker-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .maker-filters label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .reset-btn {
+    margin-left: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .reset-btn:hover { background: var(--bg-hover); }
+  .row-count {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid var(--border);
+  }
+  th, td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: var(--bg-header);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  th:hover { background: var(--bg-hover); }
+  th .sort-indicator {
+    display: inline-block;
+    margin-left: 4px;
+    color: var(--text-muted);
+    font-size: 10px;
+  }
+  th.sorted .sort-indicator { color: var(--accent); }
+  tr:nth-child(even) td { background: var(--bg-row-alt); }
+  tr:hover td { background: var(--bg-hover); }
+  td.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+  td.muted { color: var(--text-muted); }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+</head>
+<body>
+  <h1>GPU / AI Accelerator Specs</h1>
+  <div class="subtitle">52 chips. Click column headers to sort. Use the controls below to filter.</div>
+
+  <div class="controls">
+    <div class="maker-filters" id="makerFilters"></div>
+    <div class="group">
+      <label>Name</label>
+      <input type="text" id="nameFilter" placeholder="e.g. H100">
+    </div>
+    <div class="group">
+      <label>Memory (GB)</label>
+      <input type="number" id="memoryMin" placeholder="min">
+      <span>–</span>
+      <input type="number" id="memoryMax" placeholder="max">
+    </div>
+    <div class="group">
+      <label>Bandwidth (GB/s)</label>
+      <input type="number" id="bandwidthMin" placeholder="min">
+      <span>–</span>
+      <input type="number" id="bandwidthMax" placeholder="max">
+    </div>
+    <div class="group">
+      <label>TFLOPS (FP16)</label>
+      <input type="number" id="tflops_fp16Min" placeholder="min">
+      <span>–</span>
+      <input type="number" id="tflops_fp16Max" placeholder="max">
+    </div>
+    <div class="group">
+      <label>Release</label>
+      <input type="text" id="releaseFilter" placeholder="e.g. 2024">
+    </div>
+    <button class="reset-btn" id="resetBtn">Reset</button>
+  </div>
+
+  <div class="row-count" id="rowCount"></div>
+
+  <table id="specTable">
+    <thead><tr id="headerRow"></tr></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+<script>
+  const HEADERS = [["maker", "Maker"], ["name", "Name"], ["memory", "Memory (GB)"], ["bandwidth", "Bandwidth (GB/s)"], ["tflops_fp16", "TFLOPS (FP16)"], ["release_date", "Release"]];
+  const NUMERIC_KEYS = ["bandwidth", "memory", "tflops_fp16"];
+  const DATA = [{"maker": "AMD", "name": "MI455X", "memory": 432, "bandwidth": 19600, "tflops_fp16": 10000, "release_date": null, "references": ["https://www.theregister.com/2026/01/07/mi500x_amd_ai/", "https://www.servethehome.com/amds-epyc-venice-instinct-mi455x-helios-hardware-on-display-for-first-time-at-ces-2026/"]}, {"maker": "AMD", "name": "MI430X", "memory": 432, "bandwidth": 19600, "tflops_fp16": null, "release_date": null, "references": ["https://www.theregister.com/2026/01/07/mi500x_amd_ai/"]}, {"maker": "AMD", "name": "MI440X", "memory": 384, "bandwidth": 19600, "tflops_fp16": null, "release_date": null, "references": ["https://www.theregister.com/2026/01/07/mi500x_amd_ai/"]}, {"maker": "NVIDIA", "name": "GB300", "memory": 192, "bandwidth": 8000, "tflops_fp16": 10000, "release_date": "2025-09", "references": ["https://www.nvidia.com/en-us/data-center/gb300-nvl72/", "https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era/"]}, {"maker": "NVIDIA", "name": "GB200", "memory": 192, "bandwidth": 8000, "tflops_fp16": 5000, "release_date": "2024-12", "references": ["https://www.nvidia.com/en-us/data-center/gb200-nvl72/", "https://www.nvidia.com/en-us/data-center/dgx-gb200/"]}, {"maker": "AMD", "name": "MI355X", "memory": 288, "bandwidth": 8000, "tflops_fp16": 2500, "release_date": "2025-06", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html", "https://www.amd.com/en/blogs/2025/amd-instinct-mi350-series-game-changer.html"]}, {"maker": "AMD", "name": "MI350X", "memory": 288, "bandwidth": 8000, "tflops_fp16": 2300, "release_date": "2025-06", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi350/mi350x.html", "https://www.amd.com/en/blogs/2025/amd-instinct-mi350-series-game-changer.html"]}, {"maker": "NVIDIA", "name": "B200", "memory": 192, "bandwidth": 8000, "tflops_fp16": 2250, "release_date": "2024-12", "references": ["https://www.nvidia.com/en-us/data-center/dgx-b200/", "https://www.nvidia.com/en-us/data-center/hgx/"]}, {"maker": "NVIDIA", "name": "B100", "memory": 192, "bandwidth": 8000, "tflops_fp16": 1800, "release_date": "2024-03", "references": ["https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing", "https://www.nvidia.com/en-us/data-center/technologies/blackwell-architecture/"]}, {"maker": "NVIDIA", "name": "GB100", "memory": 192, "bandwidth": 8000, "tflops_fp16": 1800, "release_date": "2024-12", "references": ["https://www.nvidia.com/en-us/data-center/technologies/blackwell-architecture/", "https://nvidianews.nvidia.com/news/nvidia-blackwell-platform-arrives-to-power-a-new-era-of-computing"]}, {"maker": "AMD", "name": "MI325X", "memory": 256, "bandwidth": 6000, "tflops_fp16": 1307, "release_date": "2024-10", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi300/mi325x.html", "https://ir.amd.com/news-events/press-releases/detail/1220/amd-delivers-leadership-ai-performance-with-amd-instinct"]}, {"maker": "AMD", "name": "MI300X", "memory": 192, "bandwidth": 5300, "tflops_fp16": 1307, "release_date": "2023-12", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi300/mi300x.html", "https://rocm.docs.amd.com/en/latest/conceptual/gpu-arch/mi300.html"]}, {"maker": "AMD", "name": "MI300A", "memory": 128, "bandwidth": 5300, "tflops_fp16": 980, "release_date": "2023-12", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi300/mi300a.html", "https://rocm.docs.amd.com/en/latest/conceptual/gpu-arch/mi300.html"]}, {"maker": "NVIDIA", "name": "H200", "memory": 141, "bandwidth": 4800, "tflops_fp16": 1979, "release_date": "2024-04", "references": ["https://www.nvidia.com/en-us/data-center/h200/"]}, {"maker": "NVIDIA", "name": "H100", "memory": 96, "bandwidth": 3900, "tflops_fp16": 989, "release_date": "2022-10", "references": ["https://www.nvidia.com/en-us/data-center/h100/"]}, {"maker": "AMD", "name": "MI250X", "memory": 128, "bandwidth": 3200, "tflops_fp16": 383, "release_date": "2021-11", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi200/mi250x.html", "https://ir.amd.com/news-events/press-releases/detail/1032/new-amd-instinct-mi200-series-accelerators-bring"]}, {"maker": "AMD", "name": "MI250", "memory": 128, "bandwidth": 3200, "tflops_fp16": 362, "release_date": "2021-11", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi200/mi250.html", "https://rocm.docs.amd.com/en/latest/conceptual/gpu-arch/mi250.html"]}, {"maker": "NVIDIA", "name": "A100", "memory": 80, "bandwidth": 2000, "tflops_fp16": 312, "release_date": "2020-05", "references": ["https://www.nvidia.com/en-us/data-center/a100/", "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/nvidia-a100-datasheet-us-nvidia-1758950-r4-web.pdf"]}, {"maker": "NVIDIA", "name": "RTX PRO 6000 Blackwell Workstation Edition", "memory": 96, "bandwidth": 1792, "tflops_fp16": 1000, "release_date": "2025-04", "references": ["https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000/"]}, {"maker": "NVIDIA", "name": "RTX PRO 6000 Blackwell Max-Q Workstation Edition", "memory": 96, "bandwidth": 1792, "tflops_fp16": 878, "release_date": "2025-04", "references": ["https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/", "https://www.nvidia.com/content/dam/en-zz/Solutions/products/workstations/professional-desktop-gpus/rtx-pro-6000-max-q/workstation-datasheet-blackwell-rtx-pro-6000-max-q-nvidia-3519233.pdf"]}, {"maker": "NVIDIA", "name": "RTX 5090", "memory": 32, "bandwidth": 1792, "tflops_fp16": 419, "release_date": "2025-01", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5090/", "https://www.nvidia.com/en-us/geforce/news/rtx-50-series-graphics-cards-gpu-laptop-announcements/"]}, {"maker": "AMD", "name": "MI210", "memory": 64, "bandwidth": 1600, "tflops_fp16": 181, "release_date": "2022-03", "references": ["https://www.amd.com/en/products/accelerators/instinct/mi200/mi210.html", "https://www.amd.com/content/dam/amd/en/documents/instinct-business-docs/product-briefs/instinct-mi210-brochure.pdf"]}, {"maker": "NVIDIA", "name": "RTX PRO 6000 Blackwell Server Edition", "memory": 96, "bandwidth": 1597, "tflops_fp16": 1000, "release_date": "2025-07", "references": ["https://www.nvidia.com/en-us/data-center/rtx-pro-6000-blackwell-server-edition/"]}, {"maker": "NVIDIA", "name": "RTX PRO 5000 Blackwell 72GB", "memory": 72, "bandwidth": 1344, "tflops_fp16": 516, "release_date": "2025-12", "references": ["https://www.nvidia.com/en-us/products/workstations/professional-desktop-gpus/rtx-pro-5000/", "https://blogs.nvidia.com/blog/rtx-pro-5000-72gb-blackwell-gpu/"]}, {"maker": "NVIDIA", "name": "RTX 4090", "memory": 24, "bandwidth": 1008, "tflops_fp16": 330, "release_date": "2022-10", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4090/", "https://nvidianews.nvidia.com/news/nvidia-delivers-quantum-leap-in-performance-introduces-new-era-of-neural-rendering-with-geforce-rtx-40-series"]}, {"maker": "NVIDIA", "name": "RTX 5080", "memory": 16, "bandwidth": 960, "tflops_fp16": 225, "release_date": "2025-01", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5080/", "https://www.nvidia.com/en-us/geforce/news/rtx-50-series-graphics-cards-gpu-laptop-announcements/"]}, {"maker": "NVIDIA", "name": "RTX 3090", "memory": 24, "bandwidth": 936, "tflops_fp16": 284, "release_date": "2020-09", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3090-3090ti/", "https://www.nvidia.com/en-us/geforce/news/rtx-3090-out-september-24/"]}, {"maker": "NVIDIA", "name": "V100", "memory": 32, "bandwidth": 900, "tflops_fp16": 125, "release_date": "2017-06", "references": ["https://www.nvidia.com/en-in/data-center/v100/", "https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf"]}, {"maker": "Apple", "name": "M3 Ultra", "memory": 512, "bandwidth": 819, "tflops_fp16": 57, "release_date": "2025-03", "references": ["https://www.apple.com/newsroom/2025/03/apple-reveals-m3-ultra-taking-apple-silicon-to-a-new-extreme/", "https://en.wikipedia.org/wiki/Apple_M3"]}, {"maker": "NVIDIA", "name": "RTX PRO 4500 Blackwell Server Edition", "memory": 32, "bandwidth": 800, "tflops_fp16": 406, "release_date": "2026-03", "references": ["https://www.nvidia.com/en-us/data-center/rtx-pro-4500-blackwell-server-edition/", "https://lenovopress.lenovo.com/lp2391-thinksystem-nvidia-rtx-pro-4500-blackwell-server-edition-pcie-gen5-gpu"]}, {"maker": "Apple", "name": "M2 Ultra", "memory": 192, "bandwidth": 800, "tflops_fp16": 54, "release_date": "2023-06", "references": ["https://www.apple.com/newsroom/2023/06/apple-introduces-m2-ultra/", "https://en.wikipedia.org/wiki/Apple_M2"]}, {"maker": "NVIDIA", "name": "RTX A5000", "memory": 24, "bandwidth": 768, "tflops_fp16": 111, "release_date": "2021-04", "references": ["https://www.nvidia.com/en-us/design-visualization/rtx-a5000/", "https://images.nvidia.com/aem-dam/Solutions/design-visualization/rtx-a5000/proviz-print-nvidia-rtx-a5000-datasheet-us-nvidia-1432660-r5-web.pdf"]}, {"maker": "NVIDIA", "name": "RTX 3080", "memory": 10, "bandwidth": 760, "tflops_fp16": 238, "release_date": "2020-09", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3080-3080ti/", "https://nvidianews.nvidia.com/news/nvidia-delivers-greatest-ever-generational-leap-in-performance-with-geforce-rtx-30-series-gpus"]}, {"maker": "NVIDIA", "name": "RTX 4080", "memory": 16, "bandwidth": 717, "tflops_fp16": 195, "release_date": "2022-11", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4080-family/", "https://www.nvidia.com/en-us/geforce/news/geforce-rtx-4080-out-now/"]}, {"maker": "NVIDIA", "name": "RTX 5070", "memory": 12, "bandwidth": 672, "tflops_fp16": 123, "release_date": "2025-03", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5070-family/", "https://www.nvidia.com/en-us/geforce/news/rtx-50-series-graphics-cards-gpu-laptop-announcements/"]}, {"maker": "Apple", "name": "M5 Max", "memory": 128, "bandwidth": 614, "tflops_fp16": 33, "release_date": "2026-03", "references": ["https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/", "https://en.wikipedia.org/wiki/Apple_M5"]}, {"maker": "Apple", "name": "M4 Max", "memory": 128, "bandwidth": 546, "tflops_fp16": 34, "release_date": "2024-11", "references": ["https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/", "https://en.wikipedia.org/wiki/Apple_M4"]}, {"maker": "Apple", "name": "M4 Pro", "memory": 128, "bandwidth": 546, "tflops_fp16": 18, "release_date": "2024-11", "references": ["https://www.apple.com/newsroom/2024/10/apple-introduces-m4-pro-and-m4-max/", "https://en.wikipedia.org/wiki/Apple_M4"]}, {"maker": "NVIDIA", "name": "RTX 4070", "memory": 12, "bandwidth": 504, "tflops_fp16": 233, "release_date": "2023-04", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4070-family/", "https://nvidianews.nvidia.com/news/nvidia-geforce-rtx-4070-brings-power-of-ada-lovelace-architecture-and-dlss-3-to-millions-more-gamers-and-creators-starting-at-599"]}, {"maker": "NVIDIA", "name": "RTX 3070", "memory": 8, "bandwidth": 448, "tflops_fp16": 163, "release_date": "2020-10", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3070-3070ti/", "https://www.nvidia.com/en-us/geforce/news/geforce-rtx-3070-available-october-29/"]}, {"maker": "NVIDIA", "name": "RTX 5060", "memory": 8, "bandwidth": 448, "tflops_fp16": 77, "release_date": "2025-05", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/50-series/rtx-5060-family/", "https://www.nvidia.com/en-us/geforce/news/rtx-50-series-graphics-cards-gpu-laptop-announcements/"]}, {"maker": "Apple", "name": "M3 Max", "memory": 128, "bandwidth": 400, "tflops_fp16": 21, "release_date": "2023-11", "references": ["https://www.apple.com/newsroom/2023/10/apple-unveils-m3-m3-pro-and-m3-max-the-most-advanced-chips-for-a-personal-computer/", "https://en.wikipedia.org/wiki/Apple_M3"]}, {"maker": "NVIDIA", "name": "RTX 3060", "memory": 12, "bandwidth": 360, "tflops_fp16": 102, "release_date": "2021-02", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3060-3060ti/", "https://nvidianews.nvidia.com/news/nvidia-introduces-geforce-rtx-3060-next-generation-of-the-worlds-most-popular-gpu"]}, {"maker": "Apple", "name": "M5 Pro", "memory": 64, "bandwidth": 307, "tflops_fp16": 17, "release_date": "2026-03", "references": ["https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/", "https://en.wikipedia.org/wiki/Apple_M5"]}, {"maker": "NVIDIA", "name": "L4", "memory": 24, "bandwidth": 300, "tflops_fp16": 242, "release_date": "2023-03", "references": ["https://www.nvidia.com/en-us/data-center/l4/"]}, {"maker": "NVIDIA", "name": "T4", "memory": 16, "bandwidth": 300, "tflops_fp16": 65, "release_date": "2018-09", "references": ["https://www.nvidia.com/en-us/data-center/tesla-t4/", "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-t4/t4-tensor-core-datasheet-951643.pdf"]}, {"maker": "NVIDIA", "name": "DGX Spark", "memory": 128, "bandwidth": 273, "tflops_fp16": 250, "release_date": "2025-10", "references": ["https://www.nvidia.com/en-us/products/workstations/dgx-spark/", "https://docs.nvidia.com/dgx/dgx-spark/hardware.html"]}, {"maker": "NVIDIA", "name": "RTX 4060", "memory": 8, "bandwidth": 272, "tflops_fp16": 176, "release_date": "2023-06", "references": ["https://www.nvidia.com/en-us/geforce/graphics-cards/40-series/rtx-4060-4060ti/", "https://nvidianews.nvidia.com/news/geforce-rtx-4060-family-is-here-nvidias-revolutionary-ada-lovelace-architecture-comes-to-core-gamers-everywhere-starting-at-299"]}, {"maker": "Apple", "name": "M5", "memory": 32, "bandwidth": 154, "tflops_fp16": 8.3, "release_date": "2025-10", "references": ["https://www.apple.com/newsroom/2025/10/apple-unleashes-m5-the-next-big-leap-in-ai-performance-for-apple-silicon/", "https://en.wikipedia.org/wiki/Apple_M5"]}, {"maker": "Apple", "name": "M3 Pro", "memory": 32, "bandwidth": 150, "tflops_fp16": 13, "release_date": "2023-11", "references": ["https://www.apple.com/newsroom/2023/10/apple-unveils-m3-m3-pro-and-m3-max-the-most-advanced-chips-for-a-personal-computer/", "https://en.wikipedia.org/wiki/Apple_M3"]}, {"maker": "Apple", "name": "M4", "memory": 32, "bandwidth": 120, "tflops_fp16": 8.5, "release_date": "2024-05", "references": ["https://www.apple.com/newsroom/2024/05/apple-introduces-m4-chip/", "https://en.wikipedia.org/wiki/Apple_M4"]}, {"maker": "Apple", "name": "M3", "memory": 24, "bandwidth": 100, "tflops_fp16": 7.1, "release_date": "2023-11", "references": ["https://www.apple.com/newsroom/2023/10/apple-unveils-m3-m3-pro-and-m3-max-the-most-advanced-chips-for-a-personal-computer/", "https://en.wikipedia.org/wiki/Apple_M3"]}];
+
+  const state = {
+    sortKey: 'bandwidth',
+    sortDir: 'desc',
+    makers: new Set(),
+  };
+
+  function uniqueMakers() {
+    return Array.from(new Set(DATA.map(c => c.maker))).sort();
+  }
+
+  function buildMakerFilters() {
+    const container = document.getElementById('makerFilters');
+    const makers = uniqueMakers();
+    state.makers = new Set(makers);
+    const allLabel = document.createElement('label');
+    allLabel.innerHTML = '<strong>Maker:</strong>';
+    allLabel.style.cursor = 'default';
+    container.appendChild(allLabel);
+    for (const m of makers) {
+      const label = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = m;
+      cb.checked = true;
+      cb.addEventListener('change', () => {
+        if (cb.checked) state.makers.add(m); else state.makers.delete(m);
+        render();
+      });
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(m));
+      container.appendChild(label);
+    }
+  }
+
+  function buildHeader() {
+    const tr = document.getElementById('headerRow');
+    for (const [key, label] of HEADERS) {
+      const th = document.createElement('th');
+      th.textContent = label;
+      const ind = document.createElement('span');
+      ind.className = 'sort-indicator';
+      ind.textContent = '▲▼';
+      th.appendChild(ind);
+      th.dataset.key = key;
+      th.addEventListener('click', () => {
+        if (state.sortKey === key) {
+          state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          state.sortKey = key;
+          state.sortDir = NUMERIC_KEYS.includes(key) ? 'desc' : 'asc';
+        }
+        render();
+      });
+      tr.appendChild(th);
+    }
+  }
+
+  function compareValues(a, b, key, dir) {
+    const av = a[key];
+    const bv = b[key];
+    const aNull = av === null || av === undefined;
+    const bNull = bv === null || bv === undefined;
+    if (aNull && bNull) return 0;
+    if (aNull) return 1;
+    if (bNull) return -1;
+    let cmp;
+    if (NUMERIC_KEYS.includes(key)) {
+      cmp = av - bv;
+    } else {
+      cmp = String(av).localeCompare(String(bv));
+    }
+    return dir === 'asc' ? cmp : -cmp;
+  }
+
+  function getNum(id) {
+    const v = document.getElementById(id).value;
+    return v === '' ? null : Number(v);
+  }
+
+  function applyFilters(rows) {
+    const nameQ = document.getElementById('nameFilter').value.trim().toLowerCase();
+    const releaseQ = document.getElementById('releaseFilter').value.trim().toLowerCase();
+    const ranges = {};
+    for (const k of NUMERIC_KEYS) {
+      ranges[k] = { min: getNum(k + 'Min'), max: getNum(k + 'Max') };
+    }
+    return rows.filter(c => {
+      if (!state.makers.has(c.maker)) return false;
+      if (nameQ && !String(c.name).toLowerCase().includes(nameQ)) return false;
+      if (releaseQ && !String(c.release_date || '').toLowerCase().includes(releaseQ)) return false;
+      for (const k of NUMERIC_KEYS) {
+        const v = c[k];
+        const { min, max } = ranges[k];
+        if (min !== null) {
+          if (v === null || v === undefined || v < min) return false;
+        }
+        if (max !== null) {
+          if (v === null || v === undefined || v > max) return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  function render() {
+    const filtered = applyFilters(DATA.slice());
+    filtered.sort((a, b) => compareValues(a, b, state.sortKey, state.sortDir));
+
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    for (const c of filtered) {
+      const tr = document.createElement('tr');
+      for (const [key, _] of HEADERS) {
+        const td = document.createElement('td');
+        const v = c[key];
+        if (v === null || v === undefined) {
+          td.textContent = '-';
+          td.className = (NUMERIC_KEYS.includes(key) ? 'numeric ' : '') + 'muted';
+        } else if (key === 'name') {
+          const refs = c.references || [];
+          if (refs.length > 0) {
+            const a = document.createElement('a');
+            a.href = refs[0];
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = v;
+            td.appendChild(a);
+          } else {
+            td.textContent = v;
+          }
+        } else {
+          td.textContent = v;
+          if (NUMERIC_KEYS.includes(key)) td.className = 'numeric';
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById('rowCount').textContent =
+      `Showing ${filtered.length} of ${DATA.length} chips`;
+
+    document.querySelectorAll('th').forEach(th => {
+      const ind = th.querySelector('.sort-indicator');
+      if (th.dataset.key === state.sortKey) {
+        th.classList.add('sorted');
+        ind.textContent = state.sortDir === 'asc' ? '▲' : '▼';
+      } else {
+        th.classList.remove('sorted');
+        ind.textContent = '▲▼';
+      }
+    });
+  }
+
+  function bindFilters() {
+    const ids = ['nameFilter', 'releaseFilter'];
+    for (const k of NUMERIC_KEYS) { ids.push(k + 'Min', k + 'Max'); }
+    for (const id of ids) {
+      document.getElementById(id).addEventListener('input', render);
+    }
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      for (const id of ids) document.getElementById(id).value = '';
+      document.querySelectorAll('#makerFilters input[type="checkbox"]').forEach(cb => {
+        cb.checked = true;
+        state.makers.add(cb.value);
+      });
+      state.sortKey = 'bandwidth';
+      state.sortDir = 'desc';
+      render();
+    });
+  }
+
+  buildMakerFilters();
+  buildHeader();
+  bindFilters();
+  render();
+</script>
+</body>
+</html>
