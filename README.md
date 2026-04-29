@@ -19,6 +19,7 @@
 
 - [2026年のSearch AIはAgent Memoryである](docs/others/agent-memory.md)
 - [BBQ と DiskBBQ](docs/others/bbq.md)
+- [尼崎市 QA 検索コーパス特化 — データ合成実施レポート](docs/others/data_synthesys.md)
 - [Elastic Inference Service](docs/others/elastic-inference-service.md)
 - [Elastic Cloud 権限管理ベストプラクティス 参考ドキュメント集](docs/others/elastic-role-best-practice.md)
 - [ELSER](docs/others/elser.md)
@@ -66,6 +67,7 @@
 - [Vald 市場調査レポート](docs/vectordb/vald.md)
 - [Vespa ベクトルデータベース調査レポート](docs/vectordb/vespa.md)
 - [Weaviate 市場調査レポート](docs/vectordb/weaviate.md)
+- [Zvec 市場調査レポート](docs/vectordb/zvec.md)
 
 ### HTML ページ
 
