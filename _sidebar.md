@@ -8,25 +8,18 @@
   - [jina-embeddings-v4 モデル情報レポート](docs/jina-embed-models/jina-embeddings-v4.md)
   - [jina-embeddings-v5-text モデル情報レポート](docs/jina-embed-models/jina-embeddings-v5-text.md)
 
+- Models
+  - [harrier-oss-v1-270m アーキテクチャ解析レポート](docs/models/harrier-oss-v1-270m.md)
+  - [japanese-splade-v2 モデル情報レポート](docs/models/japanese-splade-v2.md)
+  - [jina-embeddings-v5-text-nano モデル情報レポート](docs/models/jina-embeddings-v5-text-nano.md)
+  - [jina-reranker-m0](docs/models/jina-reranker-m0.md)
+  - [Qwen3-0.6B-Base アーキテクチャ解析レポート](docs/models/Qwen3-0.6B-Base.md)
+  - [Qwen3-8B アーキテクチャ解析レポート](docs/models/Qwen3-8B.md)
+  - [voyage-4-nano アーキテクチャ解析レポート](docs/models/voyage-4-nano.md)
+
 - Others
   - [2026年のSearch AIはAgent Memoryである](docs/others/agent-memory.md)
-  - [BBQ と DiskBBQ](docs/others/bbq.md)
-  - [尼崎市 QA 検索コーパス特化 — データ合成実施レポート](docs/others/data_synthesys.md)
-  - [Elastic Inference Service](docs/others/elastic-inference-service.md)
-  - [Elastic Cloud 権限管理ベストプラクティス 参考ドキュメント集](docs/others/elastic-role-best-practice.md)
-  - [ELSER](docs/others/elser.md)
-  - [gpu_specs](docs/others/gpu_specs.md)
   - [Hard Negative Mining 手法 — 全モデル横断サマリ](docs/others/hard-negative-mining.md)
-  - [harrier-oss-v1-270m アーキテクチャ解析レポート](docs/others/harrier-oss-v1-270m.md)
-  - [HNSW (Hierarchical Navigable Small World)](docs/others/hnsw.md)
-  - [japanese-splade-v2 モデル情報レポート](docs/others/japanese-splade-v2.md)
-  - [jina-embeddings-v5-text-nano モデル情報レポート](docs/others/jina-embeddings-v5-text-nano.md)
-  - [jina-reranker-m0](docs/others/jina-reranker-m0.md)
-  - [Qwen3-0.6B-Base アーキテクチャ解析レポート](docs/others/Qwen3-0.6B-Base.md)
-  - [Qwen3-8B アーキテクチャ解析レポート](docs/others/Qwen3-8B.md)
-  - [RaBitQ](docs/others/rabitq.md)
-  - [TurboQuant](docs/others/turbo-quant.md)
-  - [voyage-4-nano アーキテクチャ解析レポート](docs/others/voyage-4-nano.md)
 
 - Reranker
   - [リランキングモデル（Cross-Encoder）市場比較レポート](docs/reranker/README.md)
