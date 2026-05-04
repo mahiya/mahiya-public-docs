@@ -1,5 +1,20 @@
 - [ホーム](/)
 
+- Hugging Face Community Blogs
+  - [HoloTab by HCompany: AI ブラウザコンパニオン](docs/hfblogs/260415_Hcompany__holotab.md)
+  - [VAKRA の内側: エージェントの推論・ツール使用・失敗モード分析](docs/hfblogs/260415_ibm-research__vakra-benchmark-analysis.md)
+  - [Ecom-RLVE: e コマース会話エージェント向けの適応的検証可能環境](docs/hfblogs/260416_ecom-rlve.md)
+  - [Sentence Transformers でマルチモーダル埋め込みモデルを訓練する](docs/hfblogs/260416_train-multimodal-sentence-transformers.md)
+  - [transformers-to-mlx Skill: コードエージェント時代の MLX 移植自動化](docs/hfblogs/260416_transformers-to-mlx.md)
+  - [AI とサイバーセキュリティの未来: なぜオープンネスが重要なのか](docs/hfblogs/260421_cybersecurity-openness.md)
+  - [QIMMA قِمّة: 品質を最優先したアラビア語 LLM リーダーボード](docs/hfblogs/260421_tiiuae__qimma-arabic-leaderboard.md)
+  - [Transformers.js を Chrome 拡張機能で使う：Gemma 4 ブラウザアシスタントの設計](docs/hfblogs/260423_transformersjs-chrome-extension.md)
+  - [DeepSeek-V4: エージェントが本当に使える 100 万トークン文脈](docs/hfblogs/260424_deepseekv4.md)
+  - [OpenAI Privacy Filter でスケーラブルな Web アプリを作る](docs/hfblogs/260427_openai-privacy-filter-web-apps.md)
+  - [AI Evals are Becoming the New Compute Bottleneck](docs/hfblogs/260429_evaleval__eval-costs-bottleneck.md)
+  - [Granite 4.1 LLMs: IBM の新世代基盤モデル](docs/hfblogs/260429_ibm-granite__granite-4-1.md)
+  - [DeepInfra が Hugging Face Inference Providers に統合](docs/hfblogs/260429_inference-providers-deepinfra.md)
+
 - Jina Embed Models
   - [Jina Embeddings 系列 5モデル 比較サマリ](docs/jina-embed-models/README.md)
   - [jina-embeddings-v1 モデル情報レポート](docs/jina-embed-models/jina-embeddings-v1.md)
@@ -17,11 +32,7 @@
   - [Qwen3-8B アーキテクチャ解析レポート](docs/models/Qwen3-8B.md)
   - [voyage-4-nano アーキテクチャ解析レポート](docs/models/voyage-4-nano.md)
 
-- Others
-  - [2026年のSearch AIはAgent Memoryである](docs/others/agent-memory.md)
-  - [Hard Negative Mining 手法 — 全モデル横断サマリ](docs/others/hard-negative-mining.md)
-
-- Reranker
+- Reranker モデル
   - [リランキングモデル（Cross-Encoder）市場比較レポート](docs/reranker/README.md)
   - [BAAI BGE Reranker 市場調査レポート](docs/reranker/baai_bge_reranker.md)
   - [Cohere Rerank 市場調査レポート](docs/reranker/cohere_rerank.md)
@@ -55,3 +66,7 @@
 - HTML ページ
   - [Elastic Cloud vs Azure AI Search / AWS OpenSearch / Google Vertex AI Search — 比較項目定義](htmls/elastic_vs.html ':ignore :target=_blank')
   - [GPU / AI Accelerator Specs](htmls/gpu_specs.html ':ignore :target=_blank')
+
+- Others
+  - [2026年のSearch AIはAgent Memoryである](docs/others/agent-memory.md)
+  - [Hard Negative Mining 手法 — 全モデル横断サマリ](docs/others/hard-negative-mining.md)

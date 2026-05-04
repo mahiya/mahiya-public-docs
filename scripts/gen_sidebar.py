@@ -15,12 +15,12 @@ from __future__ import annotations
 
 from _common import (
     HTML_LINK_OPTS,
+    KIND_HTML,
+    KIND_MD,
     ROOT,
-    category_label,
     extract_html_title,
     extract_title,
-    iter_categories,
-    iter_htmls,
+    iter_sections,
     iter_top_level_md,
     relative_link,
 )
@@ -39,21 +39,17 @@ def build_sidebar() -> str:
     if top_level:
         lines.append("")
 
-    # カテゴリディレクトリ
-    for cat, md_files in iter_categories():
-        lines.append(f"- {category_label(cat.name)}")
-        for md in md_files:
-            title = extract_title(md)
-            lines.append(f"  - [{title}]({relative_link(md)})")
-        lines.append("")
-
-    # HTML ページ (htmls/ 配下)
-    htmls = list(iter_htmls())
-    if htmls:
-        lines.append("- HTML ページ")
-        for html in htmls:
-            title = extract_html_title(html)
-            lines.append(f"  - [{title}]({relative_link(html)}{HTML_LINK_OPTS})")
+    # カテゴリ + HTML ページを優先度順に出力 (順序は CATEGORY_PRIORITY / HTML_PRIORITY で制御)
+    for label, kind, files in iter_sections():
+        lines.append(f"- {label}")
+        if kind == KIND_MD:
+            for md in files:
+                title = extract_title(md)
+                lines.append(f"  - [{title}]({relative_link(md)})")
+        elif kind == KIND_HTML:
+            for html in files:
+                title = extract_html_title(html)
+                lines.append(f"  - [{title}]({relative_link(html)}{HTML_LINK_OPTS})")
         lines.append("")
 
     # 末尾の余分な空行を 1 つに

@@ -20,12 +20,27 @@ CATEGORY_LABELS: dict[str, str] = {
     "elasticsearch": "Elasticsearch",
     "vector-db": "Vector DB",
     "vectordb": "Vector DB",
-    "reranker": "Reranker",
+    "reranker": "Reranker モデル",
+    "hfblogs": "Hugging Face Community Blogs",
 }
+
+# セクションの並び順を上書きする優先度。小さいほど上、大きいほど下。
+# 未指定のカテゴリは DEFAULT_PRIORITY (100) として扱われ、その中ではアルファベット順。
+# HTML ページセクションは HTML_PRIORITY (500) を使う。
+CATEGORY_PRIORITY: dict[str, int] = {
+    "others": 1000,  # Others は最後
+}
+DEFAULT_PRIORITY = 100
+HTML_PRIORITY = 500  # HTML ページセクションの優先度 (Others より上に出る)
 
 # Docsify のルーターに HTML パスを解釈させないためのリンクオプション。
 # 別タブで開き、SPA の history を汚さない。
 HTML_LINK_OPTS = " ':ignore :target=_blank'"
+
+# iter_sections() が返すセクション種別の識別子
+KIND_MD = "md"
+KIND_HTML = "html"
+HTML_SECTION_LABEL = "HTML ページ"
 
 
 def extract_title(md_path: Path) -> str:
@@ -64,6 +79,11 @@ def category_label(dirname: str) -> str:
     return " ".join(part.capitalize() for part in dirname.split("-"))
 
 
+def category_priority(dirname: str) -> int:
+    """ディレクトリ名の表示優先度を返す。未登録なら DEFAULT_PRIORITY。"""
+    return CATEGORY_PRIORITY.get(dirname, DEFAULT_PRIORITY)
+
+
 def relative_link(md_path: Path) -> str:
     """ROOT からの相対パスを Docsify 用のスラッシュ区切り文字列で返す。"""
     return md_path.relative_to(ROOT).as_posix()
@@ -92,12 +112,16 @@ def iter_top_level_md() -> Iterator[Path]:
 
 
 def iter_categories() -> Iterator[tuple[Path, list[Path]]]:
-    """カテゴリディレクトリと、その配下の .md ファイル一覧をイテレート。"""
+    """カテゴリディレクトリと、その配下の .md ファイル一覧をイテレート。
+
+    並び順は (CATEGORY_PRIORITY, ディレクトリ名) の辞書順。優先度が同じカテゴリは
+    アルファベット順になる。
+    """
     if not DOCS_DIR.is_dir():
         return
     categories = sorted(
         [d for d in DOCS_DIR.iterdir() if d.is_dir() and is_visible(d)],
-        key=lambda d: d.name.lower(),
+        key=lambda d: (category_priority(d.name), d.name.lower()),
     )
     for cat in categories:
         md_files = sorted(
@@ -117,3 +141,23 @@ def iter_htmls() -> Iterator[Path]:
         key=lambda p: p.name.lower(),
     )
     yield from files
+
+
+def iter_sections() -> Iterator[tuple[str, str, list[Path]]]:
+    """全セクション (カテゴリ + HTML ページ) を優先度順に yield する。
+
+    Returns: (表示ラベル, 種別 KIND_MD/KIND_HTML, ファイル一覧)。
+    優先度が同じ場合はラベル文字列でタイブレーク。
+    """
+    sections: list[tuple[int, str, str, list[Path]]] = []
+
+    for cat, md_files in iter_categories():
+        sections.append((category_priority(cat.name), category_label(cat.name), KIND_MD, md_files))
+
+    htmls = list(iter_htmls())
+    if htmls:
+        sections.append((HTML_PRIORITY, HTML_SECTION_LABEL, KIND_HTML, htmls))
+
+    sections.sort(key=lambda s: (s[0], s[1].lower()))
+    for _, label, kind, files in sections:
+        yield label, kind, files
