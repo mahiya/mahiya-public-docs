@@ -17,7 +17,7 @@ python scripts/gen_index.py     # README.md の <!-- DOCS_LIST:START/END --> 内
 
 ローカルプレビューは `index.html` を任意の静的サーバーで配信する (例: `python -m http.server`)。
 
-push 前の定型ワークフロー (索引再生成 → gitleaks スキャン → コミット作成) は `.claude/skills/pre-push/` にスキル化済み。「push 前の準備」等のフレーズで起動する。push 自体は手動。
+リリース時の定型ワークフロー (索引再生成 → gitleaks スキャン → コミット → push) は `.claude/skills/pre-push/` にスキル化済み。「push して」「pre-push を実行」等のフレーズで起動する。`.claude/settings.json` で `Bash(git push:*)` を allow / `git push --force*` を deny しているのが前提。`Co-Authored-By: Claude ...` トレーラーは Anthropic のセーフガードで拒否されるため、コミットメッセージには付けない。
 
 ## アーキテクチャ
 
