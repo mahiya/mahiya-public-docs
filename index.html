@@ -336,6 +336,11 @@
         buttonText: 'コピー',
         errorText: '失敗',
         successText: 'コピーしました'
+      },
+      latex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$']],
+        customOptions: {}
       }
     }
   </script>
@@ -348,5 +353,17 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-yaml.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-json.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs/components/prism-markdown.min.js"></script>
+  <script>
+    // MathJax v3 pre-config: disable auto-typeset on startup; docsify-latex drives rendering instead.
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$']]
+      },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 </body>
 </html>

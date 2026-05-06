@@ -37,7 +37,7 @@ xzhichao@amazon.com
 - 最近の研究 (Ma et al., 2024; Lee et al., 2024; Wang et al., 2024a; Xu et al., 2025a; Zhang et al., 2025, inter alia) では、Llama (Touvron et al., 2023) や Mistral (Jiang et al., 2023) のような事前学習済み decoder-only large language model (LLM) を用いて dense retrieval や reranking をスケーリングする試みが行われており、BERT 系モデルと比較して優れた性能を示している。
 - しかし、BERT 規模 (110M および 330M) を超えた LSR モデルの学習に関しては、これまで取り組みが限られてきた。
 - 我々の予備実験では、decoder-only LLM を用いて LSR を学習する際の 2 つの主要な課題を特定した。
-- (1) SPLADE の log-saturation で用いられる $$\mathrm{ReLU}$$ 活性化関数が、contrastive 学習の初期段階において学習の不安定性問題を引き起こす。
+- (1) SPLADE の log-saturation で用いられる $\mathrm{ReLU}$ 活性化関数が、contrastive 学習の初期段階において学習の不安定性問題を引き起こす。
 - これは一般に dying ReLU 問題 (Lu et al., 2019) として知られている。
 - (2) decoder-only LLM の単方向 attention は、検索性能を準最適にする (Lee et al., 2024; BehnamGhader et al., 2024)。
 - これら 2 つの課題に対処するため、本論文では 2 つの手法を提案する。
@@ -65,9 +65,9 @@ xzhichao@amazon.com
 
 ### 2.1 タスク定義と表記
 
-- クエリ $$Q$$ が与えられたとき、タスクは $$Q$$ に対して高い関連性を示す $$k$$ 個の文書のランク付きリスト $$\{D_1, D_2, \ldots, D_k\}$$ を見つけることである。
-- 検索は、 $$|C| > k$$ であるような文書コレクション $$C$$ から top-k の文書を見つけることによって行われる。
-- $$\theta$$ でパラメータ化された検索モデルを $$f_\theta(\cdot)$$ と表記する。
+- クエリ $Q$ が与えられたとき、タスクは $Q$ に対して高い関連性を示す $k$ 個の文書のランク付きリスト $\{D_1, D_2, \ldots, D_k\}$ を見つけることである。
+- 検索は、 $|C| > k$ であるような文書コレクション $C$ から top-k の文書を見つけることによって行われる。
+- $\theta$ でパラメータ化された検索モデルを $f_\theta(\cdot)$ と表記する。
 - 効率的な検索を可能にするため、文書コレクションは典型的にはオフラインで検索モデルによって事前にエンコードされ、いわゆる文書インデックスが構築される。
 - 検索時には、入力されたクエリがまず検索モデルによってエンコードされ、その後、事前構築された文書インデックスに対して類似度検索が実行される。
 
@@ -85,33 +85,33 @@ xzhichao@amazon.com
 ### 2.3 SPLADE
 
 - 提案手法 (第 3 節) の基礎となる SPLADE (Formal et al., 2021b,a) の定式化を詳述する。
-- vocabulary を $$V$$ 、文書を $$D$$ 、トークンを $$\{t_1, t_2, \ldots, t_{|D|}\}$$ ( $$t_i$$ は $$i$$ 番目のトークン)、その対応する文脈化表現(例: 事前学習済み BERT からのもの)を $$\{h_1, h_2, \ldots, h_{|D|}\}$$ と表記する。
-- 各 $$h_i$$ について、language modeling head(例: BERT の masked language modeling head)を用いて、隠れ表現を vocabulary サイズのベクトル $$H_i \in \mathbb{R}^{|V|}$$ に射影する。
-- $$H_i$$ の $$j$$ 番目の次元は、入力系列における $$i$$ 番目のトークンに対する vocabulary $$V$$ 中のトークン $$j$$ の重要度を表しており、実際には LM head 出力からの logit である。
-- テンソル形状 $$(|V|, |D|)$$ の $$H_D = \{H_1, H_2, \ldots, H_{|D|}\}$$ が与えられると、SPLADE は系列長次元(つまり全トークンにわたって)max-pooling を適用し、続いて ReLU 活性化と log re-scaling を適用して、入力文書 $$d$$ に対する vocabulary サイズの表現を得る:
+- vocabulary を $V$ 、文書を $D$ 、トークンを $\{t_1, t_2, \ldots, t_{|D|}\}$ ( $t_i$ は $i$ 番目のトークン)、その対応する文脈化表現(例: 事前学習済み BERT からのもの)を $\{h_1, h_2, \ldots, h_{|D|}\}$ と表記する。
+- 各 $h_i$ について、language modeling head(例: BERT の masked language modeling head)を用いて、隠れ表現を vocabulary サイズのベクトル $H_i \in \mathbb{R}^{|V|}$ に射影する。
+- $H_i$ の $j$ 番目の次元は、入力系列における $i$ 番目のトークンに対する vocabulary $V$ 中のトークン $j$ の重要度を表しており、実際には LM head 出力からの logit である。
+- テンソル形状 $(|V|, |D|)$ の $H_D = \{H_1, H_2, \ldots, H_{|D|}\}$ が与えられると、SPLADE は系列長次元(つまり全トークンにわたって)max-pooling を適用し、続いて ReLU 活性化と log re-scaling を適用して、入力文書 $d$ に対する vocabulary サイズの表現を得る:
 
 $$
 D = \log(1 + \mathrm{ReLU}(\mathrm{MaxPooling}(H_D))) \in \mathbb{R}^{|V|} \tag{1}
 $$
 
-- 同様の操作はクエリ $$Q$$ にも適用でき、クエリ表現 $$Q \in \mathbb{R}^{|V|}$$ を得る。
-- 類似度関数を $$s(\cdot)$$ (例: 内積)と表記すると、対比学習のための標準的な InfoNCE 損失 (Oord et al., 2018) で SPLADE を最適化できる。
-- 学習ペア $$(Q, D^+)$$ ( $$D^+$$ はクエリ $$Q$$ に関連する文書)、および $$Q$$ に関連しない文書のリスト $$\{D_N\}$$ を表記すると、ランキング損失は以下のように表される:
+- 同様の操作はクエリ $Q$ にも適用でき、クエリ表現 $Q \in \mathbb{R}^{|V|}$ を得る。
+- 類似度関数を $s(\cdot)$ (例: 内積)と表記すると、対比学習のための標準的な InfoNCE 損失 (Oord et al., 2018) で SPLADE を最適化できる。
+- 学習ペア $(Q, D^+)$ ( $D^+$ はクエリ $Q$ に関連する文書)、および $Q$ に関連しない文書のリスト $\{D_N\}$ を表記すると、ランキング損失は以下のように表される:
 
 $$
 \mathcal{L}_{\text{rank}}(Q, D^+, \{D_N\}) = -\log p(D = D^+ \mid Q) = -\log \frac{e^{s(Q, D^+)}}{e^{s(Q, D^+)} + \sum_{D_i \in \{D_N\}} e^{s(Q, D_i)}}
 $$
 
-- 実際には、 $$\{D_N\}$$ は hard negatives と in-batch negatives を含むことが多い (Qu et al., 2021; Ma et al., 2024)。
+- 実際には、 $\{D_N\}$ は hard negatives と in-batch negatives を含むことが多い (Qu et al., 2021; Ma et al., 2024)。
 - 式 (1) は非負性を保証することで既にある程度のスパース性を達成していることに注意されたい。
 - さらに SPLADE は、効率的な sparse 表現を学習するためにスパース性をさらに強化すべく、FLOPs regularization (Paria et al., 2020) も採用している。
-- $$Q$$ と $$D$$ に対する FLOPs regularization 損失をそれぞれ $$\mathcal{L}_{\text{reg}}^Q$$ と $$\mathcal{L}_{\text{reg}}^D$$ 、対応する係数を $$\lambda_Q$$ 、 $$\lambda_D$$ と表記すると、SPLADE は最終的な損失を以下のように最適化する:
+- $Q$ と $D$ に対する FLOPs regularization 損失をそれぞれ $\mathcal{L}_{\text{reg}}^Q$ と $\mathcal{L}_{\text{reg}}^D$ 、対応する係数を $\lambda_Q$ 、 $\lambda_D$ と表記すると、SPLADE は最終的な損失を以下のように最適化する:
 
 $$
 \mathcal{L} = \mathcal{L}_{\text{rank}}(Q, D^+, \{D_N\}) + \lambda_Q \mathcal{L}_{\text{reg}}^Q + \lambda_D \mathcal{L}_{\text{reg}}^D
 $$
 
-- 実際には、 $$\lambda_Q$$ と $$\lambda_D$$ は性能と効率のバランスを取るためにハイパーパラメータとして調整される。
+- 実際には、 $\lambda_Q$ と $\lambda_D$ は性能と効率のバランスを取るためにハイパーパラメータとして調整される。
 
 ## 3 課題と提案手法
 
@@ -124,13 +124,13 @@ $$
 ### 3.1 課題
 
 - 第一に、contrastive learning の初期段階における学習の不安定性の問題が観察された。
-- 式 (1) に示されるように、語彙サイズの表現 $$Q$$ および $$D$$ の非負性を保証するために ReLU 活性化関数が用いられている。
+- 式 (1) に示されるように、語彙サイズの表現 $Q$ および $D$ の非負性を保証するために ReLU 活性化関数が用いられている。
 - 学習が始まると、ReLU ニューロンは急速に不活性化し、任意の入力に対して 0 のみを出力するようになる。
 - これは文献において dying ReLU 問題として知られており (Lu et al., 2019)、最適化対象パラメータ、本研究の場合はバックボーン言語モデルの初期化に起因する。
 - この仮説を検証するため、MosaicBERT (Portes et al., 2023) や ModernBERT (Warner et al., 2024) を含む他の encoder-only モデルでの学習も試みた。
 - しかし、learning rate の warmup 戦略やその他のハイパーパラメータを広範に調整したにもかかわらず、同じ理由で学習は一貫して失敗した。
 
-- 第二に、オリジナルの SPLADE 実装では、モデルがまず各 token の文脈化された表現を語彙空間に射影して $$|D|$$ 個のベクトルを取得し、その後、系列長次元に対して MaxPooling を適用して単一のベクトル表現を得ていることが観察される。
+- 第二に、オリジナルの SPLADE 実装では、モデルがまず各 token の文脈化された表現を語彙空間に射影して $|D|$ 個のベクトルを取得し、その後、系列長次元に対して MaxPooling を適用して単一のベクトル表現を得ていることが観察される。
 - 明らかに、この系列レベルの MaxPooling 操作は、unidirectional attention を持つ causal LLM にとっては最適ではない。
 - なぜなら、入力系列内の早い token は後の token に attend できず、最終的なベクトル表現において情報の損失が生じるためである。
 - 要約すると、これら 2 つの課題が、SPLADE を大規模事前学習済み causal LLM に拡張する試みを阻害していると我々は考える。
@@ -145,23 +145,23 @@ $$
 - **Adaptation Phase Training.**
 - Lu et al. (2019) が指摘しているように、dying ReLU の原因は不適切に初期化されたモデルパラメータにある。
 - したがって、後続の contrastive learning フェーズで使用するための初期化を改善するため、事前学習済み causal language model を adaptation することで学習の不安定性の問題に取り組む。
-- 具体的には、入力系列 $$D$$ に対して、出力 logits $$H_D \in \mathbb{R}^{|V| \times |D|}$$ を計算できる。
+- 具体的には、入力系列 $D$ に対して、出力 logits $H_D \in \mathbb{R}^{|V| \times |D|}$ を計算できる。
 - 次に、式 (1) と類似した変換を適用するが、MaxPooling 操作は除去する:
 
 $$
 \bar{H}_D = \log(1 + \mathrm{ReLU}(H_D)) \tag{2}
 $$
 
-- ここで $$\bar{H}_D$$ テンソルは $$H_D$$ と同じ形状を持つが、すべての要素は非負である。
+- ここで $\bar{H}_D$ テンソルは $H_D$ と同じ形状を持つが、すべての要素は非負である。
 - この非負テンソルを用いて、目標系列 (本研究の場合は同じ入力系列) の確率を最大化するための causal language model loss を計算する。
-- ReLU adaptation を意図したこの causal language modeling loss を $$\mathcal{L}_{\mathrm{ReLU}}$$ 、通常の causal language model loss を $$\mathcal{L}_{\mathrm{CLM}}$$ と表記し、最終的な loss を最適化する:
+- ReLU adaptation を意図したこの causal language modeling loss を $\mathcal{L}_{\mathrm{ReLU}}$ 、通常の causal language model loss を $\mathcal{L}_{\mathrm{CLM}}$ と表記し、最終的な loss を最適化する:
 
 $$
 \mathcal{L}_{\mathrm{Adapt}} = \mathcal{L}_{\mathrm{CLM}} + \lambda_{\mathrm{ReLU}} \cdot \mathcal{L}_{\mathrm{ReLU}} \tag{3}
 $$
 
-- ここで $$\lambda_{\mathrm{ReLU}}$$ は 2 つの loss 項のバランスを取るトレードオフ重みであり、実際には 1 に設定される。
-- ここで、通常の causal language modeling loss は $$H_D$$ と目標系列との間で直接計算されることに注意する。
+- ここで $\lambda_{\mathrm{ReLU}}$ は 2 つの loss 項のバランスを取るトレードオフ重みであり、実際には 1 に設定される。
+- ここで、通常の causal language modeling loss は $H_D$ と目標系列との間で直接計算されることに注意する。
 - したがって、2 つの loss 項を 1 回の forward pass で計算できる。
 - この loss の形式により、後続の contrastive learning で使用される ReLU 活性化に対して事前学習済み causal LLM を adaptation することが可能となる。
 - 理解の容易さのため、擬似コード (PyTorch スタイル) を Section A に示す。
@@ -233,7 +233,7 @@ $$
 - 1Bモデルと8Bモデルの両方で511個の in-batch ネガティブを使用し、グローバルバッチサイズは32となる。
 - スケーラブルな訓練のため、Flash Attention 2 (Dao, 2023)、gradient checkpointing、gradient accumulation、および PyTorch FSDP (Zhao et al., 2023) などの技術を使用する。
 - コサイン学習率スケジューリングを用いて、1Bモデルは3エポック、8Bモデルは1エポック訓練する。
-- 主に4つのハイパーパラメータ、すなわち学習率、FLOPs正則化係数 $$\lambda_Q$$ および $$\lambda_D$$ 、LoRA ランク $$R$$ をチューニングする。
+- 主に4つのハイパーパラメータ、すなわち学習率、FLOPs正則化係数 $\lambda_Q$ および $\lambda_D$ 、LoRA ランク $R$ をチューニングする。
 - さらなるハイパーパラメータの詳細とハードウェア情報は Section C に譲る。
 - 推論時には、LoRA アダプタをバックボーンモデルにマージし、推論には bfloat 16 精度を使用する。
 
@@ -1331,7 +1331,7 @@ for Computational Linguistics.
 ## C ハイパーパラメータの詳細
 
 - ハイパーパラメータの詳細を表3に示す。
-- 我々は主に4つのハイパーパラメータをチューニングした：learning rate、LoRA Rank、FLOPs正則化係数 $$\lambda_Q$$ 、および $$\lambda_D$$ である。
+- 我々は主に4つのハイパーパラメータをチューニングした：learning rate、LoRA Rank、FLOPs正則化係数 $\lambda_Q$ 、および $\lambda_D$ である。
 - LoRA Rank を増やしても検索性能の向上は見られず、むしろ BEIR データセットでの性能低下を引き起こすことが分かったため、8B モデルでは rank=16 を使用している。
 - 1B モデルは 8x A100 40GB GPU を搭載した単一の EC2 p4d.24xlarge インスタンスで学習し、8B モデルは 2 台の p4d.24xlarge インスタンスで学習している。
 
