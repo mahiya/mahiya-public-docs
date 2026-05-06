@@ -56,6 +56,14 @@
 - [Voyage AI Rerank 市場調査レポート](docs/reranker/voyage_ai_rerank.md)
 - [ZeroEntropy Zerank 市場調査レポート](docs/reranker/zerank.md)
 
+### Splade
+
+- [CSPLADE: Learned Sparse Retrieval with Causal Language Models](docs/splade/csplade.md)
+- [LLMs as Sparse Retrievers: A Framework for First-Stage Product Search](docs/splade/prosper.md)
+- [SPLADE: Sparse Lexical and Expansion Model for First Stage Ranking](docs/splade/splade_v1.md)
+- [SPLADE v2: Sparse Lexical and Expansion Model for Information Retrieval](docs/splade/splade_v2.md)
+- [SPLADE-v3: New baselines for SPLADE](docs/splade/splade_v3.md)
+
 ### Vector DB
 
 - [ベクトルデータベース 市場トップ5 比較分析レポート](docs/vectordb/README.md)
